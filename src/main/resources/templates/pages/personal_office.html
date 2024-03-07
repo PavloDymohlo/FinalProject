@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal office</title>
+</head>
+<body>
+<h1>Personal office</h1>
+<form id="paymentForm" action="/personal_office/{phoneNumber}/payment" method="POST">
+    <label for="autoRenew">Automatic continuation of payment</label>
+    <input type="checkbox" id="autoRenew" name="autoRenew" checked onchange="submitAutoRenewForm()">
+</form>
+<p>Choose a subscription:</p>
+<select id="subscriptionSelect" onchange="checkSubscription()">
+    <option value="FREE">FREE</option>
+    <option value="OPTIMAL">OPTIMAL</option>
+    <option value="MAXIMUM">MAXIMUM</option>
+</select>
+<button id="paymentButton" onclick="submitPaymentForm()">Pay</button>
+<button onclick="goToEndpoint()">Go to</button>
+<br>
+<div id="messageContainer"></div>
+<p th:text="${message}" style="color: red;"></p>
+
+<script>
+    function checkSubscription() {
+        var subscriptionSelect = document.getElementById("subscriptionSelect");
+        var paymentButton = document.getElementById("paymentButton");
+
+        if (subscriptionSelect.value === "FREE") {
+            paymentButton.disabled = true;
+        } else {
+            paymentButton.disabled = false;
+        }
+    }
+
+    function submitAutoRenewForm() {
+        var autoRenewCheckbox = document.getElementById("autoRenew");
+        var autoRenewStatus = autoRenewCheckbox.checked ? "YES" : "NO";
+
+        var phoneNumber = window.location.pathname.split("personal_office/").pop().split("/")[0];
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/subscription/toggleAutoRenew", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    showMessage(response.message, true);
+                } else {
+                    showMessage("Error changing auto-renew status: " + xhr.responseText, false);
+                }
+            }
+        };
+
+        xhr.send(JSON.stringify({
+            phoneNumber: phoneNumber,
+            autoRenew: autoRenewStatus
+        }));
+    }
+
+    function submitPaymentForm() {
+        var phoneNumber = window.location.pathname.split("/").pop();
+        var subscriptionSelect = document.getElementById("subscriptionSelect");
+        var subscriptionName = subscriptionSelect.options[subscriptionSelect.selectedIndex].value;
+        var form = document.getElementById("paymentForm");
+        form.action = "/personal_office/" + phoneNumber + "/payment?subscriptionName=" + subscriptionName;
+        form.submit();
+    }
+
+    var phoneNumber = window.location.pathname.split("personal_office/").pop().split("/")[0];
+
+    function showMessage(message, success) {
+        var messageContainer = document.getElementById("messageContainer");
+        messageContainer.innerHTML = message;
+        if (success) {
+            messageContainer.style.color = "green";
+        } else {
+            messageContainer.style.color = "red";
+        }
+    }
+
+    function goToEndpoint() {
+        var subscriptionSelect = document.getElementById("subscriptionSelect");
+        var subscriptionName = subscriptionSelect.options[subscriptionSelect.selectedIndex].value;
+        var endpoint = '';
+        if (subscriptionName === 'FREE') {
+            endpoint = '/free_subscription';
+        } else if (subscriptionName === 'OPTIMAL') {
+            endpoint = '/optimal_subscription';
+        } else if (subscriptionName === 'MAXIMUM') {
+            endpoint = '/maximum_subscription';
+        }
+        window.location.href = endpoint;
+    }
+
+    showMessage("Congratulations! You are logged in to your personal account with a phone number: " + phoneNumber, true);
+</script>
+
+</body>
+</html>

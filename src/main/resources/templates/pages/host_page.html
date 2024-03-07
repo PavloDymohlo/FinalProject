@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Page</title>
+</head>
+<body>
+<h1>Welcome to Host Page</h1>
+<form action="/register" method="post">
+    <h2>Registration Form</h2>
+    <label for="regPhoneNumber">Phone Number:</label>
+    <input type="text" id="regPhoneNumber" name="phoneNumber" required><br><br>
+    <label for="regBankCardNumber">Bank Card Number:</label>
+    <input type="text" id="regBankCardNumber" name="bankCardNumber" required><br><br>
+    <label for="regPassword">Password:</label>
+    <input type="password" id="regPassword" name="password" required><br><br>
+    <input type="submit" value="Register">
+</form>
+<br>
+
+<form action="/login" method="post">
+    <h2>Login Form</h2>
+    <p th:if="${errorMessage}" class="error" style="color: red;" th:text="${errorMessage}"></p>
+    <label for="loginPhoneNumber">Phone Number:</label>
+    <input type="text" id="loginPhoneNumber" name="phoneNumber" required><br><br>
+    <label for="loginPassword">Password:</label>
+    <input type="password" id="loginPassword" name="password" required><br><br>
+    <input type="submit" value="Login">
+</form>
+
+
+</body>
+</html>
+

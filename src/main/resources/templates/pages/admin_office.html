@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Обробка зміни вибору
+            $("#entitySelect").change(function() {
+                var selectedEntity = $(this).val();
+                $(".operationForm").hide(); // Приховати всі форми операцій
+
+                // Показати вибрану форму дій
+                $("#" + selectedEntity + "Actions").show();
+            });
+
+            // Обробка події додавання користувача
+            $("#addUserForm").submit(function(event) {
+                event.preventDefault();
+                // Код для додавання користувача
+            });
+
+            // Обробка події редагування підписки
+            $("#editSubscriptionForm").submit(function(event) {
+                event.preventDefault();
+                // Код для редагування підписки
+            });
+
+            // Обробка події видалення музичного файлу
+            $("#deleteMusicFileForm").submit(function(event) {
+                event.preventDefault();
+                // Код для видалення музичного файлу
+            });
+
+            // Додайте обробники подій для інших форм
+
+        });
+    </script>
+</head>
+<body>
+<h1>Admin Page</h1>
+
+<!-- Вибір сутності -->
+<label for="entitySelect">Select Entity:</label>
+<select id="entitySelect">
+    <option value="user">User</option>
+    <option value="subscription">Subscription</option>
+    <option value="musicFile">Music File</option>
+</select>
+
+<!-- Форми дій над користувачами -->
+<div id="userActions" class="operationForm" style="display: none;">
+    <h2>User Actions</h2>
+    <!-- Форма для оновлення номеру телефону -->
+    <form id="updatePhoneNumberForm">
+        <label for="newPhoneNumber">New Phone Number:</label>
+        <input type="text" id="newPhoneNumber" name="newPhoneNumber" required pattern="^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\d{7}$">
+        <input type="submit" value="Update Phone Number">
+    </form>
+
+    <!-- Форма для оновлення номеру банківської карти -->
+    <form id="updateBankCardNumberForm">
+        <label for="newBankCardNumber">New Bank Card Number:</label>
+        <input type="text" id="newBankCardNumber" name="newBankCardNumber" required>
+        <input type="submit" value="Update Bank Card Number">
+    </form>
+
+    <!-- Форма для оновлення пароля -->
+    <form id="updatePasswordForm">
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+        <input type="submit" value="Update Password">
+    </form>
+
+    <!-- Форма для видалення користувача -->
+    <form id="deleteUserForm">
+        <label for="userIdToDelete">User ID to Delete:</label>
+        <input type="text" id="userIdToDelete" name="userIdToDelete" required>
+        <input type="submit" value="Delete User">
+    </form>
+
+    <!-- Форма для додавання нового користувача -->
+    <form id="addUserForm">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required pattern="^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\d{7}$">
+        <label for="bankCardNumber">Bank Card Number:</label>
+        <input type="text" id="bankCardNumber" name="bankCardNumber" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <input type="submit" value="Add User">
+    </form>
+
+    <!-- Додайте інші форми для інших операцій -->
+</div>
+
+<!-- Форми дій над підписками -->
+<div id="subscriptionActions" class="operationForm" style="display: none;">
+    <h2>Subscription Actions</h2>
+    <!-- Форма для редагування підписки -->
+    <form id="editSubscriptionForm">
+        <!-- Поля для редагування підписки -->
+        <input type="submit" value="Edit Subscription">
+    </form>
+    <!-- Форма для видалення підписки -->
+    <form id="deleteSubscriptionForm">
+        <!-- Поля для видалення підписки -->
+        <input type="submit" value="Delete Subscription">
+    </form>
+</div>
+
+<!-- Форми дій над музичними файлами -->
+<div id="musicFileActions" class="operationForm" style="display: none;">
+    <h2>Music File Actions</h2>
+    <!-- Форма для видалення музичного файлу -->
+    <form id="deleteMusicFileForm">
+        <!-- Поля для видалення музичного файлу -->
+        <input type="submit" value="Delete Music File">
+    </form>
+    <!-- Додайте форми для інших операцій -->
+</div>
+
+</body>
+</html>
+
