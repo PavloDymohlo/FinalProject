@@ -33,5 +33,4 @@ public class SubscriptionEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL)
     private List<UserEntity> users;
-
 }

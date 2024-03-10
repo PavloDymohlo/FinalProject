@@ -1,6 +1,7 @@
 package ua.project.FinalProject.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 import ua.project.FinalProject.Enum.SubscriptionEnum;
@@ -12,27 +13,23 @@ import ua.project.FinalProject.repository.SubscriptionRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import ua.project.FinalProject.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class SubscriptionService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
+    private final BankAccountRepository bankAccountRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public void handleExpiredSubscription(UserEntity user) {
         if (user.getAutoRenew() == AutoRenewStatus.YES) {
             SubscriptionEntity currentSubscription = user.getSubscription();
             BigDecimal subscriptionPrice = currentSubscription.getPrice();
             BankAccountEntity bankAccount = bankAccountRepository.findByBankCardNumber(user.getBankCardNumber());
-
             if (bankAccount != null && bankAccount.getBalance().compareTo(subscriptionPrice) >= 0) {
                 bankAccount.setBalance(bankAccount.getBalance().subtract(subscriptionPrice));
                 bankAccountRepository.save(bankAccount);
@@ -69,14 +66,12 @@ public class SubscriptionService {
         if (user == null) {
             throw new IllegalArgumentException("User not found");
         }
-
         AutoRenewStatus currentStatus = user.getAutoRenew();
         if (currentStatus == AutoRenewStatus.YES) {
             user.setAutoRenew(AutoRenewStatus.NO);
         } else {
             user.setAutoRenew(AutoRenewStatus.YES);
         }
-
         userRepository.save(user);
     }
 

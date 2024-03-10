@@ -1,15 +1,15 @@
 package ua.project.FinalProject.service.mock;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class BankService {
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
+    private final BankAccountRepository bankAccountRepository;
 
     public boolean checkBankCard(long bankCardNumber, BigDecimal amount) {
         return bankAccountRepository.existsByBankCardNumber(bankCardNumber);

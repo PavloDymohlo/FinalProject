@@ -1,6 +1,6 @@
 package ua.project.FinalProject.validation;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.project.FinalProject.service.mock.BankAccountRepository;
 import ua.project.FinalProject.entity.SubscriptionEntity;
@@ -8,14 +8,12 @@ import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.repository.UserRepository;
 
 @Component
+@RequiredArgsConstructor
 public class UserValidation {
 
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SubscriptionEntity subscriptionEntity;
+    private final BankAccountRepository bankAccountRepository;
+    private final UserRepository userRepository;
+    private final SubscriptionEntity subscriptionEntity;
 
     public boolean isValidPhoneNumberFormat(long phoneNumber) {
         String phoneRegex = "^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\\d{7}$";
@@ -40,7 +38,7 @@ public class UserValidation {
     }
 
     public boolean validateBankCardNotLinked(long bankCardNumber) {
-      return userRepository.existsByBankCardNumber(bankCardNumber);
+        return userRepository.existsByBankCardNumber(bankCardNumber);
     }
 
     public void validateSubscriptionNotNull(SubscriptionEntity subscriptionEntity) {
@@ -48,11 +46,13 @@ public class UserValidation {
             throw new IllegalStateException("Maximum subscription not found");
         }
     }
+
     public void validateUserNotNull(UserEntity user) {
         if (user == null) {
             throw new IllegalArgumentException("User with provided phone number does not exist");
         }
     }
+
     public UserEntity getUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

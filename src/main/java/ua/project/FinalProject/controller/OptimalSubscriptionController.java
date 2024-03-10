@@ -1,6 +1,6 @@
 package ua.project.FinalProject.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +12,12 @@ import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.service.MusicFileService;
 import ua.project.FinalProject.service.UserService;
 
-import java.security.Principal;
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/personal_office/{phoneNumber}")
 public class OptimalSubscriptionController {
-    @Autowired
-    private MusicFileService musicFileService;
-
-    @Autowired
-    private UserService userService;
+    private final MusicFileService musicFileService;
+    private final UserService userService;
 
     @GetMapping("/optimal_subscription")
     public String showOptimalSubscriptionPage(@PathVariable String phoneNumber, Model model, Authentication authentication) {

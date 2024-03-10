@@ -1,6 +1,6 @@
 package ua.project.FinalProject.scheduler;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ua.project.FinalProject.entity.UserEntity;
@@ -10,10 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class SubscriptionScheduler {
-
-    @Autowired
-    private SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService;
 
     @Scheduled(fixedRate = 60000)
     public void checkSubscriptionExpiration() {

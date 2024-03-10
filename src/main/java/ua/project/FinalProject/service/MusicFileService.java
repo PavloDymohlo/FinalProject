@@ -1,6 +1,6 @@
 package ua.project.FinalProject.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MusicFileService {
-    @Autowired
-    private MusicFileRepository musicFileRepository;
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
-    @Autowired
-    private SubscriptionService subscriptionService;
+    private final MusicFileRepository musicFileRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final SubscriptionService subscriptionService;
 
     public List<MusicFileEntity> getAllMusicFilesSortedBySubscription(SubscriptionEnum subscriptionEnum) {//+
         SubscriptionEntity subscriptionEntity = subscriptionRepository.findBySubscriptionEnum(subscriptionEnum);
@@ -29,6 +27,7 @@ public class MusicFileService {
 
         return musicFiles;
     }
+
     @Transactional
     public void addMusicFile(MusicFileEntity musicFile) {
         musicFileRepository.save(musicFile);

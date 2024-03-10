@@ -1,9 +1,7 @@
 package ua.project.FinalProject.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,13 +10,11 @@ import ua.project.FinalProject.Enum.SubscriptionEnum;
 import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.repository.UserRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -31,17 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userEntity == null) {
             throw new UsernameNotFoundException("User not found with phone number: " + phoneNumber);
         }
-
         String role = determineRole(userEntity.getSubscription().getSubscriptionEnum());
-
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(role);
-
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                 String.valueOf(userEntity.getPhoneNumber()),
                 userEntity.getPassword(),
                 authorities
         );
-
         return userDetails;
     }
 

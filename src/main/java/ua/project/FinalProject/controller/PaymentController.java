@@ -8,10 +8,9 @@ import ua.project.FinalProject.service.UserService;
 
 
 @Controller
-@RequestMapping("/personal_office/{phoneNumber}/payment")
 @RequiredArgsConstructor
+@RequestMapping("/personal_office/{phoneNumber}/payment")
 public class PaymentController {
-
     private final UserService userService;
 
     @PostMapping()

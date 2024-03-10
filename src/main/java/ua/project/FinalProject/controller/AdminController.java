@@ -2,7 +2,6 @@ package ua.project.FinalProject.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,20 +25,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminController {
-
-
     private final UserService userService;
-
-
     private final SubscriptionService subscriptionService;
-
-
     private final MusicFileService musicFileService;
 
     @GetMapping("/{phoneNumber}")
     public String showAdminOffice(@PathVariable("phoneNumber") String phoneNumber, Model model, RedirectAttributes redirectAttributes) {
         log.info("Received request for admin office with phone number: {}", phoneNumber);
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();

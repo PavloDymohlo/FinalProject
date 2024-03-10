@@ -1,17 +1,13 @@
 package ua.project.FinalProject.entity;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Entity
 @Data
@@ -49,5 +45,4 @@ public class UserEntity {
     public void setAutoRenew(AutoRenewStatus autoRenew) {
         this.autoRenew = autoRenew;
     }
-
 }
