@@ -128,27 +128,6 @@ public class UserService {
         user.setPhoneNumber(newPhoneNumber);
         userRepository.save(user);
     }
-
-    @Transactional
-    public void updateBankCardNumber(long userId, long newBankCardNumber) {
-        UserValidation userValidation = new UserValidation();
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        userValidation.validateBankCardExists(newBankCardNumber);
-        userValidation.validateBankCardNotLinked(newBankCardNumber);
-        user.setBankCardNumber(newBankCardNumber);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void updatePassword(long userId, String newPassword) {
-        UserValidation userValidation = new UserValidation();
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
-
     @Transactional
     public void deleteUser(long userId) {
         userRepository.deleteById(userId);

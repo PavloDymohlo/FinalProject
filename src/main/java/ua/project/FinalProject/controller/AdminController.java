@@ -88,14 +88,6 @@ public class AdminController {
         userService.updatePhoneNumber(id, newPhoneNumber);
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/{phoneNumber}/users/updatePassword/{id}")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> requestBody) {
-        String newPassword = requestBody.get("newPassword");
-        userService.updatePassword(id, newPassword);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{phoneNumber}/subscriptions")
     public ResponseEntity<List<SubscriptionEntity>> getAllSubscriptions() {
         List<SubscriptionEntity> subscriptions = subscriptionService.getAllSubscriptions();
