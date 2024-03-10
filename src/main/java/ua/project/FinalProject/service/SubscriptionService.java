@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 import ua.project.FinalProject.Enum.SubscriptionEnum;
-import ua.project.FinalProject.bankData.entity.BankAccountEntity;
-import ua.project.FinalProject.bankData.repository.BankAccountRepository;
+import ua.project.FinalProject.service.mock.BankAccountEntity;
+import ua.project.FinalProject.service.mock.BankAccountRepository;
 import ua.project.FinalProject.entity.SubscriptionEntity;
 import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.repository.SubscriptionRepository;
@@ -60,10 +60,10 @@ public class SubscriptionService {
         userRepository.save(user);
     }
 
-
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }
+
     public void toggleAutoRenew(long phoneNumber, AutoRenewStatus autoRenewStatus) {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         if (user == null) {
@@ -79,33 +79,7 @@ public class SubscriptionService {
 
         userRepository.save(user);
     }
-    public SubscriptionEntity addSubscription(SubscriptionEntity subscription) {
-        return subscriptionRepository.save(subscription);
-    }
 
-    // Оновлення назви підписки
-    public SubscriptionEntity updateSubscriptionName(long subscriptionId, String newName) {
-        Optional<SubscriptionEntity> optionalSubscription = subscriptionRepository.findById(subscriptionId);
-        if (optionalSubscription.isPresent()) {
-            SubscriptionEntity subscription = optionalSubscription.get();
-            subscription.setSubscriptionEnum(SubscriptionEnum.valueOf(newName));
-            return subscriptionRepository.save(subscription);
-        } else {
-            throw new IllegalArgumentException("Subscription not found");
-        }
-    }
-
-    // Видалення підписки
-    public void deleteSubscription(long subscriptionId) {
-        Optional<SubscriptionEntity> optionalSubscription = subscriptionRepository.findById(subscriptionId);
-        if (optionalSubscription.isPresent()) {
-            subscriptionRepository.deleteById(subscriptionId);
-        } else {
-            throw new IllegalArgumentException("Subscription not found");
-        }
-    }
-
-    // Отримання підписки по айді
     public SubscriptionEntity getSubscriptionById(long subscriptionId) {
         Optional<SubscriptionEntity> optionalSubscription = subscriptionRepository.findById(subscriptionId);
         if (optionalSubscription.isPresent()) {
@@ -115,10 +89,10 @@ public class SubscriptionService {
         }
     }
 
-    // Отримання всіх підписок
     public List<SubscriptionEntity> getAllSubscriptions() {
         return subscriptionRepository.findAll();
     }
+
     public SubscriptionEntity getSubscriptionByName(String subscriptionName) {
         return subscriptionRepository.findBySubscriptionEnum(SubscriptionEnum.valueOf(subscriptionName));
     }

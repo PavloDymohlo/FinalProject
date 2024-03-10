@@ -1,5 +1,4 @@
-package ua.project.FinalProject.bankData.entity;
-
+package ua.project.FinalProject.service.mock;
 
 
 import lombok.AllArgsConstructor;

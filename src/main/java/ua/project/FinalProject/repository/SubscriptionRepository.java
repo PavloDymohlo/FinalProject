@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity, Long> {
 
     SubscriptionEntity findBySubscriptionEnum(SubscriptionEnum subscriptionEnum);
+
 }

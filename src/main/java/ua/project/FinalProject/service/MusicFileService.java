@@ -22,8 +22,6 @@ public class MusicFileService {
     @Autowired
     private SubscriptionService subscriptionService;
 
-
-
     public List<MusicFileEntity> getAllMusicFilesSortedBySubscription(SubscriptionEnum subscriptionEnum) {//+
         SubscriptionEntity subscriptionEntity = subscriptionRepository.findBySubscriptionEnum(subscriptionEnum);
 
@@ -47,7 +45,6 @@ public class MusicFileService {
         }
     }
 
-
     public void deleteMusicFileById(Long id) {
         musicFileRepository.deleteById(id);
     }
@@ -58,5 +55,22 @@ public class MusicFileService {
 
     public List<MusicFileEntity> getAllMusicFiles() {
         return musicFileRepository.findAll();
+    }
+
+    public SubscriptionEntity getSubscriptionByName(String subscriptionName) {
+        return subscriptionRepository.findBySubscriptionEnum(SubscriptionEnum.valueOf(subscriptionName));
+    }
+
+    @Transactional
+    public void updateMusicFile(Long id, String musicFileName, SubscriptionEntity subscription) {
+        Optional<MusicFileEntity> musicFileOptional = musicFileRepository.findById(id);
+        if (musicFileOptional.isPresent()) {
+            MusicFileEntity musicFile = musicFileOptional.get();
+            musicFile.setMusicFileName(musicFileName);
+            musicFile.setSubscriptionEntity(subscription);
+            musicFileRepository.save(musicFile);
+        } else {
+            throw new IllegalArgumentException("Music file with the provided id not found");
+        }
     }
 }

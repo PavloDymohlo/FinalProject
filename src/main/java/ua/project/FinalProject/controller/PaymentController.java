@@ -1,13 +1,11 @@
 package ua.project.FinalProject.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.project.FinalProject.service.UserService;
 
-import java.util.Map;
 
 @Controller
 @RequestMapping("/personal_office/{phoneNumber}/payment")

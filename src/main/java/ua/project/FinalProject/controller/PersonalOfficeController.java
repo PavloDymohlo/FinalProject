@@ -30,3 +30,19 @@ public class PersonalOfficeController {
         }
     }
 }
+
+//    @GetMapping("/{phoneNumber}")
+//    public String showPersonalOffice(@PathVariable("phoneNumber") String phoneNumber, Model model) {
+//        try {
+//            long phone = Long.parseLong(phoneNumber);
+//            UserEntity user = userService.getUserByPhoneNumber(phone);
+//            if (user != null) {
+//                model.addAttribute("user", user);
+//                return "pages/personal_office";
+//            } else {
+//                return "pages/error";
+//            }
+//        } catch (NumberFormatException e) {
+//            return "pages/error";
+//        }
+//    }

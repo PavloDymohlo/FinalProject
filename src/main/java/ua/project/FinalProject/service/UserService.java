@@ -1,17 +1,21 @@
 package ua.project.FinalProject.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 import ua.project.FinalProject.Enum.SubscriptionEnum;
-import ua.project.FinalProject.bankData.entity.BankAccountEntity;
-import ua.project.FinalProject.bankData.repository.BankAccountRepository;
+import ua.project.FinalProject.service.mock.BankAccountEntity;
+import ua.project.FinalProject.service.mock.BankAccountRepository;
 import ua.project.FinalProject.entity.SubscriptionEntity;
 import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.repository.SubscriptionRepository;
 import ua.project.FinalProject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.project.FinalProject.security.CustomUserDetailsService;
+import ua.project.FinalProject.validation.UserValidation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,45 +31,45 @@ public class UserService {
     private SubscriptionRepository subscriptionRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserValidation userValidation;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     public UserEntity registerUser(long phoneNumber, long bankCardNumber, String password) {
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+        if (userValidation.doesUserExistByPhoneNumber(phoneNumber)) {
             throw new IllegalArgumentException("Phone number already exists");
         }
-        String phoneRegex = "^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\\d{7}$";
-        if (!String.valueOf(phoneNumber).matches(phoneRegex)) {
+        if (!userValidation.isValidPhoneNumberFormat(phoneNumber)) {
             throw new IllegalArgumentException("Invalid phone number format");
         }
-        if (!bankAccountRepository.existsByBankCardNumber(bankCardNumber)) {
+        if(!userValidation.validateBankCardExists(bankCardNumber)){
             throw new IllegalArgumentException("Bank card number does not exist");
-        }
-        if (userRepository.existsByBankCardNumber(bankCardNumber)) {
+        };
+        if(userValidation.validateBankCardNotLinked(bankCardNumber)){
             throw new IllegalArgumentException("Bank card number already linked to another user");
-        }
+        };
         SubscriptionEntity subscriptionEntity = subscriptionRepository
-                .findBySubscriptionEnum(SubscriptionEnum.valueOf(String.valueOf(SubscriptionEnum.MAXIMUM)));
-        if (subscriptionEntity == null) {
-            throw new IllegalStateException("Maximum subscription not found");
-        }
-            UserEntity user = new UserEntity();
-            user.setPhoneNumber(phoneNumber);
-            user.setBankCardNumber(bankCardNumber);
-            user.setPassword(passwordEncoder.encode(password));
-            user.setSubscription(subscriptionEntity);
-            user.setEndTime(LocalDateTime.now().plusMinutes(subscriptionEntity.getDurationMinutes()));
-            return userRepository.save(user);
-        }
+                .findBySubscriptionEnum(SubscriptionEnum.MAXIMUM);
+        userValidation.validateSubscriptionNotNull(subscriptionEntity);
+        UserEntity user = new UserEntity();
+        user.setPhoneNumber(phoneNumber);
+        user.setBankCardNumber(bankCardNumber);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setSubscription(subscriptionEntity);
+        user.setEndTime(LocalDateTime.now().plusMinutes(subscriptionEntity.getDurationMinutes()));
+
+        return userRepository.save(user);
+    }
+
 
     public String loginIn(long phoneNumber, String password) {
-        String phoneRegex = "^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\\d{7}$";
-        if (!String.valueOf(phoneNumber).matches(phoneRegex)) {
+        if (!userValidation.isValidPhoneNumberFormat(phoneNumber)) {
             throw new IllegalArgumentException("Invalid phone number format");
         }
 
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new IllegalArgumentException("User with provided phone number does not exist");
-        }
+        userValidation.validateUserNotNull(user);
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Incorrect password");
@@ -73,21 +77,19 @@ public class UserService {
 
         return "success";
     }
+
     public UserEntity getUserByPhoneNumber(long phoneNumber) {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new IllegalArgumentException("User with provided phone number does not exist");
-        }
+        userValidation.validateUserNotNull(user);
+
         return user;
     }
 
     @Transactional
     public void subscriptionPayment(long phoneNumber, String subscriptionName) {
-        UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new IllegalArgumentException("User with the provided phone number not found");
-        }
+        userValidation.validateUserNotNull(userRepository.findByPhoneNumber(phoneNumber));
 
+        UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         BankAccountEntity bankAccount = bankAccountRepository.findByBankCardNumber(user.getBankCardNumber());
         if (bankAccount == null) {
             throw new IllegalArgumentException("User's bank account not found");
@@ -122,24 +124,22 @@ public class UserService {
         user.setEndTime(endTime);
         userRepository.save(user);
     }
+
     public void setAutoRenew(long phoneNumber, AutoRenewStatus status) {
+        userValidation.validateUserNotNull(userRepository.findByPhoneNumber(phoneNumber));
+
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
         user.setAutoRenew(status);
         userRepository.save(user);
     }
+
     @Transactional
     public void updatePhoneNumber(long userId, long newPhoneNumber) {
-        // Перевіряємо правильність формату нового номеру телефону
-        String phoneRegex = "^80(?:50|66|95|99|67|68|96|97|98|63|73|93)\\d{7}$";
-        if (!String.valueOf(newPhoneNumber).matches(phoneRegex)) {
+        if (!userValidation.isValidPhoneNumberFormat(newPhoneNumber)) {
             throw new IllegalArgumentException("Invalid phone number format");
         }
 
-        // Перевіряємо наявність нового номеру телефону в базі даних
-        if (userRepository.existsByPhoneNumber(newPhoneNumber)) {
+        if (userValidation.doesUserExistByPhoneNumber(newPhoneNumber)) {
             throw new IllegalArgumentException("Phone number already exists");
         }
 
@@ -149,43 +149,67 @@ public class UserService {
         userRepository.save(user);
     }
 
+
+
+
     @Transactional
     public void updateBankCardNumber(long userId, long newBankCardNumber) {
+        UserValidation userValidation = new UserValidation();
+
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Перевірка чи існує банківська картка в базі даних
-        if (!bankAccountRepository.existsByBankCardNumber(newBankCardNumber)) {
-            throw new IllegalArgumentException("Bank card number does not exist");
-        }
-
-        // Перевірка чи банківська картка вже пов'язана з іншим користувачем
-        if (userRepository.existsByBankCardNumber(newBankCardNumber)) {
-            throw new IllegalArgumentException("Bank card number already linked to another user");
-        }
+        userValidation.validateBankCardExists(newBankCardNumber);
+        userValidation.validateBankCardNotLinked(newBankCardNumber);
 
         user.setBankCardNumber(newBankCardNumber);
         userRepository.save(user);
     }
 
+
     @Transactional
     public void updatePassword(long userId, String newPassword) {
+        UserValidation userValidation = new UserValidation();
+
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
     @Transactional
     public void deleteUser(long userId) {
         userRepository.deleteById(userId);
     }
 
     public UserEntity getUserById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userValidation.getUserById(userId);
     }
+
 
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
+    }
+    public UserDetailsService userDetailsService() {
+        return this::getUserByPhoneNumber;
+    }
+
+    private UserDetails getUserByPhoneNumber(String phoneNumber) {
+        long phoneNumberValue = Long.parseLong(phoneNumber);
+        return customUserDetailsService.loadUserByUsername(String.valueOf(phoneNumberValue));
+    }
+    public boolean isAdminSubscription(long phoneNumber) {
+        UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        SubscriptionEntity subscription = user.getSubscription();
+        if (subscription == null) {
+            return false;
+        }
+
+        return subscription.getSubscriptionEnum() == SubscriptionEnum.ADMIN;
     }
 }

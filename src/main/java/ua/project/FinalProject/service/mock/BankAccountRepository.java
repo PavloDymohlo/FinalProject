@@ -1,6 +1,5 @@
-package ua.project.FinalProject.bankData.repository;
+package ua.project.FinalProject.service.mock;
 
-import ua.project.FinalProject.bankData.entity.BankAccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;
@@ -8,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BankAccountRepository extends JpaRepository<BankAccountEntity, Long> {
     boolean existsByBankCardNumber(long bankCardNumber);
+
     BankAccountEntity findByBankCardNumber(long bankCardNumber);
 }

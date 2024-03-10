@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface MusicFileRepository extends JpaRepository<MusicFileEntity, Long> {
     List<MusicFileEntity> findBySubscriptionEntity(SubscriptionEntity subscriptionEntity);
-
 }

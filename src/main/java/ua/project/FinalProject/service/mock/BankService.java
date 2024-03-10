@@ -1,7 +1,5 @@
-package ua.project.FinalProject.bankData.service;
+package ua.project.FinalProject.service.mock;
 
-import ua.project.FinalProject.bankData.entity.BankAccountEntity;
-import ua.project.FinalProject.bankData.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +14,6 @@ public class BankService {
     public boolean checkBankCard(long bankCardNumber, BigDecimal amount) {
         return bankAccountRepository.existsByBankCardNumber(bankCardNumber);
     }
-
 
     @Transactional(transactionManager = "bankTransactionManager")
     public boolean withdrawalOfMoney(String bankCardNumber, BigDecimal amount) {
