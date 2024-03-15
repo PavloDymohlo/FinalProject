@@ -2,6 +2,7 @@ package ua.project.FinalProject.service;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 import ua.project.FinalProject.Enum.SubscriptionEnum;
@@ -20,6 +21,7 @@ import ua.project.FinalProject.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionService {
     private final UserRepository userRepository;
     private final BankAccountRepository bankAccountRepository;
@@ -31,18 +33,19 @@ public class SubscriptionService {
             BigDecimal subscriptionPrice = currentSubscription.getPrice();
             BankAccountEntity bankAccount = bankAccountRepository.findByBankCardNumber(user.getBankCardNumber());
             if (bankAccount != null && bankAccount.getBalance().compareTo(subscriptionPrice) >= 0) {
+                log.info("Auto-renewal is enabled, sufficient funds found for subscription renewal.");
                 bankAccount.setBalance(bankAccount.getBalance().subtract(subscriptionPrice));
                 bankAccountRepository.save(bankAccount);
                 user.setEndTime(LocalDateTime.now().plusMinutes(currentSubscription.getDurationMinutes()));
                 userRepository.save(user);
-                System.out.println("Subscription continued.");
+                log.info("Subscription continued");
             } else {
+                log.warn("Insufficient funds for subscription renewal, switching to free subscription.");
                 switchSubscriptionToFree(user);
-                System.out.println("Insufficient funds, switched to free subscription.");
             }
         } else {
+            log.info("Auto-renewal is disabled, switching to free subscription.");
             switchSubscriptionToFree(user);
-            System.out.println("Auto-renewal is disabled, switched to free subscription.");
         }
     }
 
@@ -55,24 +58,11 @@ public class SubscriptionService {
         user.setEndTime(null);
         user.getSubscription().setId(freeSubscription.getId());
         userRepository.save(user);
+        log.info("Subscription switched to free successfully.");
     }
 
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
-    }
-
-    public void toggleAutoRenew(long phoneNumber, AutoRenewStatus autoRenewStatus) {
-        UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        AutoRenewStatus currentStatus = user.getAutoRenew();
-        if (currentStatus == AutoRenewStatus.YES) {
-            user.setAutoRenew(AutoRenewStatus.NO);
-        } else {
-            user.setAutoRenew(AutoRenewStatus.YES);
-        }
-        userRepository.save(user);
     }
 
     public SubscriptionEntity getSubscriptionById(long subscriptionId) {
@@ -80,6 +70,7 @@ public class SubscriptionService {
         if (optionalSubscription.isPresent()) {
             return optionalSubscription.get();
         } else {
+            log.error("Subscription with ID {} not found", subscriptionId);
             throw new IllegalArgumentException("Subscription not found");
         }
     }
@@ -88,7 +79,4 @@ public class SubscriptionService {
         return subscriptionRepository.findAll();
     }
 
-    public SubscriptionEntity getSubscriptionByName(String subscriptionName) {
-        return subscriptionRepository.findBySubscriptionEnum(SubscriptionEnum.valueOf(subscriptionName));
-    }
 }

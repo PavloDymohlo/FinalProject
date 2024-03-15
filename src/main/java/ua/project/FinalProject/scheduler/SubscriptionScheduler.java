@@ -1,6 +1,7 @@
 package ua.project.FinalProject.scheduler;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ua.project.FinalProject.entity.UserEntity;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionScheduler {
     private final SubscriptionService subscriptionService;
 
@@ -20,9 +22,10 @@ public class SubscriptionScheduler {
         for (UserEntity user : users) {
             LocalDateTime endTime = user.getEndTime();
             if (endTime != null && endTime.isBefore(LocalDateTime.now())) {
+                log.info("Subscription expired for user with ID {}", user.getId());
                 subscriptionService.handleExpiredSubscription(user);
-                System.out.println("update");
             }
         }
+        log.info("Subscription expiration check completed.");
     }
 }

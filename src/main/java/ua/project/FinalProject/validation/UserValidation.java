@@ -20,17 +20,8 @@ public class UserValidation {
         return String.valueOf(phoneNumber).matches(phoneRegex);
     }
 
-    public boolean isValidBankCardNumberFormat(long bankCardNumber) {
-        String cardRegex = "^\\d{16}$"; // Перевірка на 16 цифр
-        return String.valueOf(bankCardNumber).matches(cardRegex);
-    }
-
     public boolean doesUserExistByPhoneNumber(long phoneNumber) {
         return userRepository.existsByPhoneNumber(phoneNumber);
-    }
-
-    public boolean doesUserExistByBankCardNumber(long bankCardNumber) {
-        return userRepository.existsByBankCardNumber(bankCardNumber);
     }
 
     public boolean validateBankCardExists(long bankCardNumber) {

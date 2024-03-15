@@ -1,9 +1,6 @@
 package ua.project.FinalProject.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import ua.project.FinalProject.Enum.AutoRenewStatus;
 
 import javax.persistence.*;
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @ToString(exclude = "subscription")
 @Table(name = "users")
 public class UserEntity {
@@ -45,4 +43,5 @@ public class UserEntity {
     public void setAutoRenew(AutoRenewStatus autoRenew) {
         this.autoRenew = autoRenew;
     }
+
 }

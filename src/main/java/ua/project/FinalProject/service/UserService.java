@@ -1,6 +1,7 @@
 package ua.project.FinalProject.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final BankAccountRepository bankAccountRepository;
@@ -33,16 +35,20 @@ public class UserService {
 
     public UserEntity registerUser(long phoneNumber, long bankCardNumber, String password) {
         if (userValidation.doesUserExistByPhoneNumber(phoneNumber)) {
+            log.error("Phone number {} already exists", phoneNumber);
             throw new IllegalArgumentException("Phone number already exists");
         }
         if (!userValidation.isValidPhoneNumberFormat(phoneNumber)) {
+            log.error("Invalid phone number format: {}", phoneNumber);
             throw new IllegalArgumentException("Invalid phone number format");
         }
         if (!userValidation.validateBankCardExists(bankCardNumber)) {
+            log.error("Bank card number {} does not exist", bankCardNumber);
             throw new IllegalArgumentException("Bank card number does not exist");
         }
         ;
         if (userValidation.validateBankCardNotLinked(bankCardNumber)) {
+            log.error("Bank card number {} already linked to another user", bankCardNumber);
             throw new IllegalArgumentException("Bank card number already linked to another user");
         }
         ;
@@ -60,19 +66,23 @@ public class UserService {
 
     public String loginIn(long phoneNumber, String password) {
         if (!userValidation.isValidPhoneNumberFormat(phoneNumber)) {
+            log.error("Invalid phone number format: {}", phoneNumber);
             throw new IllegalArgumentException("Invalid phone number format");
         }
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         userValidation.validateUserNotNull(user);
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.error("Incorrect password for user with phone number: {}", phoneNumber);
             throw new IllegalArgumentException("Incorrect password");
         }
+        log.info("User login successful: {}", phoneNumber);
         return "success";
     }
 
     public UserEntity getUserByPhoneNumber(long phoneNumber) {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         userValidation.validateUserNotNull(user);
+        log.info("User with phone number {} found: {}", phoneNumber, user);
         return user;
     }
 
@@ -82,15 +92,18 @@ public class UserService {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         BankAccountEntity bankAccount = bankAccountRepository.findByBankCardNumber(user.getBankCardNumber());
         if (bankAccount == null) {
+            log.error("User's bank account not found for user with phone number: {}", phoneNumber);
             throw new IllegalArgumentException("User's bank account not found");
         }
         SubscriptionEntity newSubscription = subscriptionRepository.findBySubscriptionEnum(SubscriptionEnum.valueOf(subscriptionName));
         if (newSubscription == null) {
+            log.error("Subscription {} not found", subscriptionName);
             throw new IllegalArgumentException("Subscription not found");
         }
         BigDecimal subscriptionPrice = newSubscription.getPrice();
         BigDecimal userBalance = bankAccount.getBalance();
         if (userBalance.compareTo(subscriptionPrice) < 0) {
+            log.error("Insufficient funds for the subscription for user with phone number: {}", phoneNumber);
             throw new IllegalArgumentException("Insufficient funds for the subscription");
         }
         SubscriptionEntity currentSubscription = user.getSubscription();
@@ -106,6 +119,7 @@ public class UserService {
         bankAccountRepository.save(bankAccount);
         user.setEndTime(endTime);
         userRepository.save(user);
+        log.info("Subscription payment processed successfully for user with phone number: {}", phoneNumber);
     }
 
     public void setAutoRenew(long phoneNumber, AutoRenewStatus status) {
@@ -113,20 +127,27 @@ public class UserService {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         user.setAutoRenew(status);
         userRepository.save(user);
+        log.info("Auto renew status set successfully for user with phone number: {}", phoneNumber);
     }
 
     @Transactional
     public void updatePhoneNumber(long userId, long newPhoneNumber) {
         if (!userValidation.isValidPhoneNumberFormat(newPhoneNumber)) {
+            log.error("Invalid phone number format: {}", newPhoneNumber);
             throw new IllegalArgumentException("Invalid phone number format");
         }
         if (userValidation.doesUserExistByPhoneNumber(newPhoneNumber)) {
+            log.error("Phone number {} already exists", newPhoneNumber);
             throw new IllegalArgumentException("Phone number already exists");
         }
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", userId);
+                    return new IllegalArgumentException("User not found");
+                });
         user.setPhoneNumber(newPhoneNumber);
         userRepository.save(user);
+        log.info("Phone number updated successfully for user with ID: {}", userId);
     }
     @Transactional
     public void deleteUser(long userId) {
@@ -153,10 +174,12 @@ public class UserService {
     public boolean isAdminSubscription(long phoneNumber) {
         UserEntity user = userRepository.findByPhoneNumber(phoneNumber);
         if (user == null) {
+            log.error("User not found with phone number: {}", phoneNumber);
             throw new IllegalArgumentException("User not found");
         }
         SubscriptionEntity subscription = user.getSubscription();
         if (subscription == null) {
+            log.info("User with phone number {} does not have any subscription", phoneNumber);
             return false;
         }
         return subscription.getSubscriptionEnum() == SubscriptionEnum.ADMIN;

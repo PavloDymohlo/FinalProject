@@ -1,6 +1,7 @@
 package ua.project.FinalProject.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import ua.project.FinalProject.service.UserService;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/personal_office/{phoneNumber}")
 public class MaximumSubscriptionController {
     private final MusicFileService musicFileService;
@@ -31,8 +33,10 @@ public class MaximumSubscriptionController {
             model.addAttribute("freeMusicFiles", musicFileService.getAllMusicFilesSortedBySubscription(SubscriptionEnum.FREE));
             model.addAttribute("optimalMusicFiles", musicFileService.getAllMusicFilesSortedBySubscription(SubscriptionEnum.OPTIMAL));
             model.addAttribute("maximumMusicFiles", musicFileService.getAllMusicFilesSortedBySubscription(SubscriptionEnum.MAXIMUM));
+            log.info("User with phone number {} accessed maximum subscription page.", phoneNumber);
             return "pages/maximum_subscription";
         } else {
+            log.warn("Unauthorized access to maximum subscription page attempted with phone number: {}", phoneNumber);
             return "redirect:/host_page";
         }
     }

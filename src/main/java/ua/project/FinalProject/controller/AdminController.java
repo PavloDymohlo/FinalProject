@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin")
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
     private final SubscriptionService subscriptionService;
@@ -39,23 +39,28 @@ public class AdminController {
             if (currentUser != null && userService.isAdminSubscription(currentUser.getPhoneNumber())) {
                 try {
                     long phone = Long.parseLong(phoneNumber);
+                    log.debug("Searching for user with phone number: {}", phone);
                     UserEntity user = userService.getUserByPhoneNumber(phone);
                     if (user != null) {
                         model.addAttribute("user", user);
                         return "pages/admin_office";
                     } else {
                         redirectAttributes.addFlashAttribute("errorMessage", "User not found");
+                        log.warn("User not found for phone number: {}", phone);
                         return "redirect:/admin";
                     }
                 } catch (NumberFormatException e) {
                     redirectAttributes.addFlashAttribute("errorMessage", "Invalid phone number");
+                    log.error("Invalid phone number format: {}", phoneNumber);
                     return "redirect:/admin";
                 }
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "You do not have permission to access this page");
+                log.warn("Unauthorized access attempted by user: {}", userDetails.getUsername());
                 return "redirect:/pages/personal_office";
             }
         } else {
+            log.warn("Unauthorized access attempted. Redirecting to login page.");
             return "redirect:/login";
         }
     }
@@ -63,6 +68,7 @@ public class AdminController {
     @GetMapping("/{phoneNumber}/users")
     public ResponseEntity<List<UserEntity>> getAllUsers() {
         List<UserEntity> users = userService.getAllUsers();
+        log.info("Retrieved {} users.", users.size());
         return ResponseEntity.ok(users);
     }
 
@@ -70,8 +76,10 @@ public class AdminController {
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         UserEntity user = userService.getUserById(id);
         if (user != null) {
+            log.info("Retrieved user with ID {}: {}", id, user);
             return ResponseEntity.ok(user);
         } else {
+            log.warn("User not found for ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
@@ -79,6 +87,7 @@ public class AdminController {
     @DeleteMapping("/{phoneNumber}/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        log.info("User with ID {} has been successfully deleted.", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -86,11 +95,13 @@ public class AdminController {
     public ResponseEntity<Void> updatePhoneNumber(@PathVariable Long id, @RequestBody Map<String, Long> requestBody) {
         Long newPhoneNumber = requestBody.get("newPhoneNumber");
         userService.updatePhoneNumber(id, newPhoneNumber);
+        log.info("Phone number has been successfully updated for user with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/{phoneNumber}/subscriptions")
     public ResponseEntity<List<SubscriptionEntity>> getAllSubscriptions() {
         List<SubscriptionEntity> subscriptions = subscriptionService.getAllSubscriptions();
+        log.info("Retrieved {} subscriptions.", subscriptions.size());
         return ResponseEntity.ok(subscriptions);
     }
 
@@ -98,8 +109,10 @@ public class AdminController {
     public ResponseEntity<SubscriptionEntity> getSubscriptionById(@PathVariable Long id) {
         SubscriptionEntity subscription = subscriptionService.getSubscriptionById(id);
         if (subscription != null) {
+            log.info("Retrieved subscription with ID {}: {}", id, subscription);
             return ResponseEntity.ok(subscription);
         } else {
+            log.warn("Subscription not found for ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
@@ -107,6 +120,7 @@ public class AdminController {
     @GetMapping("/{phoneNumber}/musicFiles")
     public ResponseEntity<List<MusicFileEntity>> getAllMusicFiles() {
         List<MusicFileEntity> musicFiles = musicFileService.getAllMusicFiles();
+        log.info("Retrieved {} music files.", musicFiles.size());
         return ResponseEntity.ok(musicFiles);
     }
 
@@ -114,8 +128,10 @@ public class AdminController {
     public ResponseEntity<MusicFileEntity> getMusicFileById(@PathVariable Long id) {
         MusicFileEntity musicFile = musicFileService.getMusicFileById(id).orElse(null);
         if (musicFile != null) {
+            log.info("Retrieved music file with ID {}: {}", id, musicFile);
             return ResponseEntity.ok(musicFile);
         } else {
+            log.warn("music file not found for ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }

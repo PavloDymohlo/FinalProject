@@ -14,9 +14,9 @@ import ua.project.FinalProject.service.JwtService;
 import ua.project.FinalProject.service.UserService;
 
 @Controller
-@RequestMapping("/login")
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/login")
 public class LoginController {
     private final UserService userService;
     private final JwtService jwtService;
@@ -25,9 +25,11 @@ public class LoginController {
     @GetMapping
     public String loginUserShow(Model model) {
         try {
+            log.info("User login redirected to personal office.");
             return "redirect:/personal_office/";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            log.error("Error occurred during user login: {}", e.getMessage());
             return "pages/host_page";
         }
     }

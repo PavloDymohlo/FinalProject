@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @ToString(exclude = {"musicFiles", "users"})
 @Table(name = "subscriptions")
 public class SubscriptionEntity {

@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @ToString(exclude = "subscriptionEntity")
 @Table(name = "musicFiles")
 public class MusicFileEntity {

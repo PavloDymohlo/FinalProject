@@ -17,9 +17,9 @@ import ua.project.FinalProject.service.JwtService;
 import ua.project.FinalProject.service.UserService;
 
 @Controller
-@RequestMapping("/register")
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/register")
 public class RegController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
@@ -34,9 +34,11 @@ public class RegController {
             userService.setAutoRenew(user.getPhoneNumber(), AutoRenewStatus.YES);
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(String.valueOf(user.getPhoneNumber()));
             String jwtToken = jwtService.generateToken(userDetails);
+            log.info("User registered successfully with phone number {}", user.getPhoneNumber());
             log.info("Generated JWT token: {}", jwtToken);
             return ResponseEntity.ok(jwtToken);
         } catch (IllegalArgumentException e) {
+            log.error("Registration failed for user with phone number {}: {}", user.getPhoneNumber(), e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
