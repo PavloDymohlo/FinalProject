@@ -15,9 +15,9 @@ import ua.project.FinalProject.entity.UserEntity;
 import ua.project.FinalProject.security.CustomUserDetailsService;
 import ua.project.FinalProject.service.JwtService;
 import ua.project.FinalProject.service.UserService;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +41,6 @@ public class LoginControllerTest {
 
     @Test
     public void testLoginUser_Success() throws Exception {
-        // Arrange
         UserEntity user = new UserEntity();
         user.setPhoneNumber(80501234569L);
         user.setPassword("password");
@@ -57,13 +56,11 @@ public class LoginControllerTest {
         when(jwtService.generateToken(any(UserDetails.class))).thenReturn("generated_token");
         when(userService.isAdminSubscription(anyLong())).thenReturn(false);
 
-        // Act & Assert
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"phoneNumber\": \"1234567890\", \"password\": \"password\" }")
+                        .content("{ \"phoneNumber\": \"" + user.getPhoneNumber() + "\", \"password\": \"" + user.getPassword() + "\" }")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().string("redirect:/personal_office"));
     }
-
 }

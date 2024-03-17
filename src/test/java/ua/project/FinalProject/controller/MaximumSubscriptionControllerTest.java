@@ -1,4 +1,5 @@
 package ua.project.FinalProject.controller;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.ui.Model;
 import ua.project.FinalProject.Enum.SubscriptionEnum;
 import ua.project.FinalProject.entity.SubscriptionEntity;
 import ua.project.FinalProject.entity.UserEntity;
@@ -40,7 +40,6 @@ public class MaximumSubscriptionControllerTest {
 
     @MockBean
     private JwtService jwtService;
-
 
     @Test
     void MaximumSubscriptionControllerTest_ReturnsMaximumSubscriptionPage() throws Exception {
@@ -71,7 +70,6 @@ public class MaximumSubscriptionControllerTest {
         verify(musicFileService, times(1)).getAllMusicFilesSortedBySubscription(SubscriptionEnum.OPTIMAL);
         verify(musicFileService, times(1)).getAllMusicFilesSortedBySubscription(SubscriptionEnum.MAXIMUM);
     }
-
 
     @Test
     void MaximumSubscriptionControllerTest_ReturnsRedirectToHostPage() throws Exception {

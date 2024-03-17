@@ -1,5 +1,7 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,11 +19,13 @@ import ua.project.FinalProject.service.UserService;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/login")
+@Tag(name = "Login Controller", description = "Operations related to user login")
 public class LoginController {
     private final UserService userService;
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
 
+    @Operation(summary = "Show login form")
     @GetMapping
     public String loginUserShow(Model model) {
         try {
@@ -34,6 +38,7 @@ public class LoginController {
         }
     }
 
+    @Operation(summary = "Login user")
     @PostMapping
     public ResponseEntity<String> loginUser(@RequestBody UserEntity user) {
         try {

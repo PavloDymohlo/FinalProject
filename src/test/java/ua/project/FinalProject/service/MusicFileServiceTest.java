@@ -62,6 +62,7 @@ public class MusicFileServiceTest {
         assertEquals("file1.mp3", result.get(0).getMusicFileName());
         assertEquals("file2.mp3", result.get(1).getMusicFileName());
     }
+
     @Test
     public void MusicFilesService_GetMusicFileById() {
         Long id = 1L;
@@ -73,6 +74,7 @@ public class MusicFileServiceTest {
 
         assertEquals(Optional.of(musicFileEntity), result);
     }
+
     @Test
     public void MusicFilesService_GetAllMusicFiles() {
         MusicFileEntity musicFile1 = new MusicFileEntity(1L, "file1.mp3", null);

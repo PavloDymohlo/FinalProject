@@ -1,5 +1,7 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -12,9 +14,11 @@ import ua.project.FinalProject.service.UserService;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/personal_office/{phoneNumber}/payment")
+@Tag(name = "Payment Controller", description = "Operations related to payment processing")
 public class PaymentController {
     private final UserService userService;
 
+    @Operation(summary = "Process payment")
     @PostMapping()
     public String processPayment(@PathVariable long phoneNumber, @RequestParam String subscriptionName, Model model) {
         try {

@@ -1,5 +1,7 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,9 +18,10 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/personal_office/{phoneNumber}")
+@Tag(name = "Free Subscription Controller", description = "Operations related to free subscriptions")
 public class FreeSubscriptionController {
     private final MusicFileService musicFileService;
-
+    @Operation(summary = "Show free subscription page")
     @GetMapping("/free_subscription")
     public String showFreeSubscriptionPage(Model model, @PathVariable String phoneNumber, Principal principal) {
         if (principal != null && principal.getName().equals(phoneNumber)) {

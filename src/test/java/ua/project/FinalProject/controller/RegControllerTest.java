@@ -44,8 +44,7 @@ public class RegControllerTest {
     }
 
     @Test
-    public void testRegisterUser_Success() throws Exception {
-        // Arrange
+    public void RegControllerTest_RegisterUser_Success() throws Exception {
         UserEntity userEntity = new UserEntity();
         userEntity.setPhoneNumber(80663256999L);
         userEntity.setBankCardNumber(1234567890123456L);
@@ -54,24 +53,20 @@ public class RegControllerTest {
         when(jwtService.generateToken(any())).thenReturn("jwtToken");
         when(userService.registerUser(anyLong(), anyLong(), anyString())).thenReturn(userEntity);
 
-        // Act
         ResponseEntity<String> response = regController.registerUser(model, userEntity);
 
-        // Assert
         verify(userService, times(1)).registerUser(80663256999L, 1234567890123456L, "password");
         verify(userService, times(1)).setAutoRenew(80663256999L, AutoRenewStatus.YES);
         verify(customUserDetailsService, times(1)).loadUserByUsername("80663256999");
         verify(jwtService, times(1)).generateToken(any());
         verifyNoMoreInteractions(userService, customUserDetailsService, jwtService);
 
-        // Check response
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody().equals("jwtToken");
     }
 
     @Test
     public void testRegisterUser_Failure() throws Exception {
-        // Arrange
         UserEntity userEntity = new UserEntity();
         userEntity.setPhoneNumber(80663256999L);
         userEntity.setBankCardNumber(1234567890123456L);
@@ -80,14 +75,11 @@ public class RegControllerTest {
         when(userService.registerUser(anyLong(), anyLong(), anyString()))
                 .thenThrow(new IllegalArgumentException("Invalid phone number"));
 
-        // Act
         ResponseEntity<String> response = regController.registerUser(model, userEntity);
 
-        // Assert
         verify(userService, times(1)).registerUser(80663256999L, 1234567890123456L, "password");
         verifyNoMoreInteractions(userService, customUserDetailsService, jwtService);
 
-        // Check response
         assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
         assert response.getBody().equals("Invalid phone number");
     }

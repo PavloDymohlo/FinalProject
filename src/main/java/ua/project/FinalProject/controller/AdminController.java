@@ -1,8 +1,13 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,11 +29,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/admin")
+@Tag(name = "Admin Controller", description = "Operations related to administration")
 public class AdminController {
     private final UserService userService;
     private final SubscriptionService subscriptionService;
     private final MusicFileService musicFileService;
-
     @GetMapping("/{phoneNumber}")
     public String showAdminOffice(@PathVariable("phoneNumber") String phoneNumber, Model model, RedirectAttributes redirectAttributes) {
         log.info("Received request for admin office with phone number: {}", phoneNumber);
@@ -64,14 +69,18 @@ public class AdminController {
             return "redirect:/login";
         }
     }
-
+    @Operation(summary = "Get all users")
     @GetMapping("/{phoneNumber}/users")
     public ResponseEntity<List<UserEntity>> getAllUsers() {
         List<UserEntity> users = userService.getAllUsers();
         log.info("Retrieved {} users.", users.size());
         return ResponseEntity.ok(users);
     }
-
+    @Operation(summary = "Get user by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the user"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @GetMapping("/{phoneNumber}/users/{id}")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         UserEntity user = userService.getUserById(id);
@@ -83,14 +92,14 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @Operation(summary = "Delete user by ID")
     @DeleteMapping("/{phoneNumber}/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         log.info("User with ID {} has been successfully deleted.", id);
         return ResponseEntity.noContent().build();
     }
-
+    @Operation(summary = "Update user's phone number")
     @PutMapping("/{phoneNumber}/users/updatePhoneNumber/{id}")
     public ResponseEntity<Void> updatePhoneNumber(@PathVariable Long id, @RequestBody Map<String, Long> requestBody) {
         Long newPhoneNumber = requestBody.get("newPhoneNumber");
@@ -98,13 +107,18 @@ public class AdminController {
         log.info("Phone number has been successfully updated for user with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
+    @Operation(summary = "Get all subscriptions")
     @GetMapping("/{phoneNumber}/subscriptions")
     public ResponseEntity<List<SubscriptionEntity>> getAllSubscriptions() {
         List<SubscriptionEntity> subscriptions = subscriptionService.getAllSubscriptions();
         log.info("Retrieved {} subscriptions.", subscriptions.size());
         return ResponseEntity.ok(subscriptions);
     }
-
+    @Operation(summary = "Get subscription by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the subscription"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found")
+    })
     @GetMapping("/{phoneNumber}/subscriptions/{id}")
     public ResponseEntity<SubscriptionEntity> getSubscriptionById(@PathVariable Long id) {
         SubscriptionEntity subscription = subscriptionService.getSubscriptionById(id);
@@ -116,14 +130,18 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @Operation(summary = "Get all music files")
     @GetMapping("/{phoneNumber}/musicFiles")
     public ResponseEntity<List<MusicFileEntity>> getAllMusicFiles() {
         List<MusicFileEntity> musicFiles = musicFileService.getAllMusicFiles();
         log.info("Retrieved {} music files.", musicFiles.size());
         return ResponseEntity.ok(musicFiles);
     }
-
+    @Operation(summary = "Get music file by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the music file"),
+            @ApiResponse(responseCode = "404", description = "Music file not found")
+    })
     @GetMapping("/{phoneNumber}/musicFiles/{id}")
     public ResponseEntity<MusicFileEntity> getMusicFileById(@PathVariable Long id) {
         MusicFileEntity musicFile = musicFileService.getMusicFileById(id).orElse(null);

@@ -1,5 +1,7 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,11 +22,13 @@ import ua.project.FinalProject.service.UserService;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/register")
+@Tag(name = "Registration Controller", description = "Operations related to user registration")
 public class RegController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtService jwtService;
 
+    @Operation(summary = "Register user")
     @PostMapping
     public ResponseEntity<String> registerUser(Model model, @RequestBody UserEntity user) {
         try {

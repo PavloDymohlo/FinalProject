@@ -27,26 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userEntity == null) {
             throw new UsernameNotFoundException("User not found with phone number: " + phoneNumber);
         }
-        String role = determineRole(userEntity.getSubscription().getSubscriptionEnum());
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(role);
+        String subscriptionRole = userEntity.getSubscription().getSubscriptionEnum().name();
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_" +subscriptionRole );
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                 String.valueOf(userEntity.getPhoneNumber()),
                 userEntity.getPassword(),
                 authorities
         );
         return userDetails;
-    }
-
-    private String determineRole(SubscriptionEnum subscriptionEnum) {
-        switch (subscriptionEnum) {
-            case OPTIMAL:
-                return "ROLE_OPTIMAL";
-            case MAXIMUM:
-                return "ROLE_MAXIMUM";
-            case ADMIN:
-                return "ROLE_ADMIN";
-            default:
-                return "ROLE_FREE";
-        }
     }
 }

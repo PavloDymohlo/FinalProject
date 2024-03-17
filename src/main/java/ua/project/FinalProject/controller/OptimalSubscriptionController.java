@@ -1,5 +1,7 @@
 package ua.project.FinalProject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -17,10 +19,12 @@ import ua.project.FinalProject.service.UserService;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/personal_office/{phoneNumber}")
+@Tag(name = "Optimal Subscription Controller", description = "Operations related to optimal subscriptions")
 public class OptimalSubscriptionController {
     private final MusicFileService musicFileService;
     private final UserService userService;
 
+    @Operation(summary = "Show optimal subscription page")
     @GetMapping("/optimal_subscription")
     public String showOptimalSubscriptionPage(@PathVariable String phoneNumber, Model model, Authentication authentication) {
         UserEntity user = userService.getUserByPhoneNumber(Long.parseLong(phoneNumber));

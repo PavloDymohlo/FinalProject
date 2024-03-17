@@ -15,11 +15,8 @@ import ua.project.FinalProject.Enum.SubscriptionEnum;
 import ua.project.FinalProject.service.JwtService;
 import ua.project.FinalProject.service.MusicFileService;
 import ua.project.FinalProject.service.UserService;
-
 import java.util.Collections;
-
 import static org.mockito.Mockito.when;
-
 
 @WebMvcTest(controllers = FreeSubscriptionController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -35,7 +32,7 @@ public class FreeSubscriptionControllerTest {
     private UserService userService;
 
     @Test
-    public void testShowFreeSubscriptionPage_WithAuthorizedUser() throws Exception {
+    public void FreeSubscriptionControllerTest_ShowFreeSubscriptionPage_WithAuthorizedUser() throws Exception {
         String phoneNumber = "80633214588";
         when(musicFileService.getAllMusicFilesSortedBySubscription(SubscriptionEnum.FREE))
                 .thenReturn(Collections.emptyList());
@@ -44,7 +41,6 @@ public class FreeSubscriptionControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("pages/free_subscription"));
     }
-
 
     @Test
     public void FreeSubscriptionControllerTest_ShowFreeSubscriptionPage_WithUnauthorizedUser() throws Exception {
