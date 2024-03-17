@@ -1,6 +1,7 @@
 package ua.project.FinalProject.Enum;
+;
 
-public enum SubscriptionEnum {
+public enum SubscriptionEnum{
     FREE,
     OPTIMAL,
     MAXIMUM,

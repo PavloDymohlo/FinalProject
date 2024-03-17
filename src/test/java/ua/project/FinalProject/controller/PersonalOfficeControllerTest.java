@@ -5,43 +5,48 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ua.project.FinalProject.entity.UserEntity;
+import ua.project.FinalProject.service.JwtService;
 import ua.project.FinalProject.service.UserService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
+@WebMvcTest(PersonalOfficeController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class PersonalOfficeControllerTest {
-    @Mock
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private UserService userService;
-    @Mock
-    private UserEntity userEntity;
+    @MockBean
+    private JwtService jwtService;
 
     @InjectMocks
     private PersonalOfficeController personalOfficeController;
 
     @Test
-    public void PersonalOfficeControllerTest_ShowPersonalOffice_UserFound() {
-        Model model = new ConcurrentModel();
-        String phoneNumber = "80978520111";
+    public void PersonalOfficeControllerTest_ValidPhoneNumber() throws Exception {
+        long validPhoneNumber = 80978856999L;
         UserEntity user = new UserEntity();
-        when(userService.getUserByPhoneNumber(anyLong())).thenReturn(user);
-        String viewName = personalOfficeController.showPersonalOffice(phoneNumber, model);
-        assertEquals("pages/personal_office", viewName);
-        assertEquals(user, model.getAttribute("user"));
-        verify(userService, times(1)).getUserByPhoneNumber(Long.parseLong(phoneNumber));
-    }
+        user.setPhoneNumber(validPhoneNumber);
 
-    @Test
-    public void PersonalOfficeControllerTest_ShowPersonalOffice_UserNotFound() {
-        Model model = new ConcurrentModel();
-        String phoneNumber = "80978520111";
-        when(userService.getUserByPhoneNumber(anyLong())).thenReturn(null);
-        String viewName = personalOfficeController.showPersonalOffice(phoneNumber, model);
-        assertEquals("pages/error", viewName);
-        verify(userService, times(1)).getUserByPhoneNumber(Long.parseLong(phoneNumber));
+        when(userService.getUserByPhoneNumber(anyLong())).thenReturn(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/personal_office/{phoneNumber}", validPhoneNumber))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("pages/personal_office"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("user"))
+                .andExpect(MockMvcResultMatchers.model().attribute("user", user));
     }
 }
