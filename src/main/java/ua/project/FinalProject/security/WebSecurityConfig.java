@@ -1,0 +1,47 @@
+package ua.project.FinalProject.security;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.servlet.Filter;
+
+@Configuration
+@RequiredArgsConstructor
+@EnableWebSecurity
+public class WebSecurityConfig {
+
+    private final JwtToken jwtToken;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+                .cors().disable()
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers("/host_page", "/register", "/login").permitAll()
+                        .antMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .antMatchers("/personal_office/**").authenticated()
+                        .antMatchers(HttpMethod.GET, "/main").permitAll()
+                        .antMatchers("/free_subscription").hasAnyRole("FREE", "OPTIMAL", "MAXIMUM", "ADMIN")
+                        .antMatchers("/optimal_subscription").hasAnyRole("MAXIMUM", "OPTIMAL", "ADMIN")
+                        .antMatchers("/maximum_subscription").hasAnyRole("MAXIMUM", "ADMIN")
+                        .antMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore((Filter) jwtToken, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}

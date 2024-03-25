@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Error</title>
+</head>
+<body>
+
+<h1>Registration Error</h1>
+
+<p>Registration was unsuccessful due to the following reason:</p>
+<p th:text="${errorMessage}" style="color: red;"></p>
+
+<a href="/host_page" style="text-decoration: none;">
+  <button type="button">Return to Main Menu</button>
+</a>
+
+</body>
+</html>
